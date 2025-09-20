@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu</title>
+    <style>
+        .dish { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; }
+        .controls { display: flex; align-items: center; gap: 5px; }
+        .total { margin-top: 20px; font-weight: bold; font-size: 18px; }
+        button { padding: 5px 10px; }
+        ul.flash { list-style: none; padding: 0; }
+        ul.flash li.success { color: green; }
+        ul.flash li.danger { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Our Menu</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flash">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" id="menu-form">
+        {% for item in menu %}
+            <div class="dish" data-price="{{ item.price }}">
+                <h3>{{ item.name }} - ${{ "%.2f"|format(item.price) }}</h3>
+                <p>{{ item.ingredients }}</p>
+                {% if item.description %}
+                    <p>{{ item.description }}</p>
+                {% endif %}
+                <div class="controls">
+                    <button type="button" onclick="changeCount({{ item.id }}, -1)">-</button>
+                    <span id="display_{{ item.id }}">0</span>
+                    <button type="button" onclick="changeCount({{ item.id }}, 1)">+</button>
+                    <input type="hidden" name="count_{{ item.id }}" id="count_{{ item.id }}" value="0">
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="total">
+            Total: $<span id="total">0.00</span>
+        </div>
+
+        <button type="submit">Place Order</button>
+    </form>
+
+    <script>
+        function changeCount(id, delta) {
+            const input = document.getElementById('count_' + id);
+            const display = document.getElementById('display_' + id);
+            let value = parseInt(input.value) + delta;
+            if (value < 0) value = 0;
+            input.value = value;
+            display.innerText = value;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            let total = 0;
+            document.querySelectorAll('.dish').forEach(dish => {
+                const count = parseInt(dish.querySelector('input[type="hidden"]').value);
+                const price = parseFloat(dish.dataset.price);
+                total += count * price;
+            });
+            document.getElementById('total').innerText = total.toFixed(2);
+        }
+    </script>
+</body>
+</html>
+{% endblock %}

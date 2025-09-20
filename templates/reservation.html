@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Дату і час вводьте у форматі типу: 2025-09-21 19:30:00 </h3>
+<form action="{{ url_for('reservation') }}" method="post">
+    {{ form.hidden_tag() }}
+    <div class="form-group">
+        {{ form.timestamp.label(class="form-label") }}
+        {{ form.timestamp(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.table_number.label(class="form-label") }}
+        {{ form.table_number(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.numbers.label(class="form-label") }}
+        {{ form.numbers(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.submit(class="form-control") }}
+    </div>
+</form>
+{% endblock content %}
