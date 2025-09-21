@@ -6,18 +6,142 @@
 <head>
     <meta charset="UTF-8">
     <title>Menu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
     <style>
-        .dish { margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; }
-        .controls { display: flex; align-items: center; gap: 5px; }
-        .total { margin-top: 20px; font-weight: bold; font-size: 18px; }
-        button { padding: 5px 10px; }
-        ul.flash { list-style: none; padding: 0; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #ffe5b4, #ffcccc, #ccf2ff);
+            min-height: 100vh;
+            margin: 0;
+            padding: 0 20px;
+            color: #333;
+        }
+
+        h1 {
+            font-family: 'Pacifico', cursive;
+            text-align: center;
+            font-size: 3em;
+            margin: 30px 0;
+            color: #ff5733;
+            text-shadow: 2px 2px #fff;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        ul.flash {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
         ul.flash li.success { color: green; }
         ul.flash li.danger { color: red; }
+
+        /* Контейнер меню */
+        .menu-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .dish {
+            background: #ffffffaa;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .dish:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.25);
+        }
+
+        .dish img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            transition: transform 0.4s;
+        }
+
+        .dish img:hover {
+            transform: scale(1.05);
+        }
+
+        .dish h3 {
+            margin: 0;
+            font-size: 1.4em;
+            color: #e74c3c;
+        }
+
+        .dish p {
+            margin: 5px 0;
+            font-size: 0.95em;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        button {
+            background: linear-gradient(45deg, #ff6f61, #ffcc00);
+            color: white;
+            font-weight: bold;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #ffcc00, #ff6f61);
+            transform: scale(1.15) rotate(-3deg);
+        }
+
+        .total {
+            text-align: center;
+            margin-top: 25px;
+            font-weight: bold;
+            font-size: 1.6em;
+            color: #2c3e50;
+            background: #ffffffaa;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        form {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .submit-btn {
+            margin-top: 20px;
+            font-size: 1.2em;
+            padding: 12px 25px;
+            border-radius: 30px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(90deg, #0072ff, #00c6ff);
+        }
     </style>
 </head>
 <body>
-    <h1>Our Menu</h1>
+    <h1>🍽 Our Delicious Menu 🍹</h1>
 
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
@@ -30,27 +154,34 @@
     {% endwith %}
 
     <form method="POST" id="menu-form">
-        {% for item in menu %}
-            <div class="dish" data-price="{{ item.price }}">
-                <h3>{{ item.name }} - ${{ "%.2f"|format(item.price) }}</h3>
-                <p>{{ item.ingredients }}</p>
-                {% if item.description %}
-                    <p>{{ item.description }}</p>
-                {% endif %}
-                <div class="controls">
-                    <button type="button" onclick="changeCount({{ item.id }}, -1)">-</button>
-                    <span id="display_{{ item.id }}">0</span>
-                    <button type="button" onclick="changeCount({{ item.id }}, 1)">+</button>
-                    <input type="hidden" name="count_{{ item.id }}" id="count_{{ item.id }}" value="0">
+        <div class="menu-container">
+            {% for item in menu %}
+                <div class="dish" data-price="{{ item.price }}">
+                    {% if item.image_url %}
+                        <img src="{{ item.image_url }}" alt="{{ item.name }}">
+                    {% endif %}
+                    <h3>{{ item.name }} - ${{ "%.2f"|format(item.price) }}</h3>
+                    <p>{{ item.ingredients }}</p>
+                    {% if item.description %}
+                        <p><em>{{ item.description }}</em></p>
+                    {% endif %}
+                    <div class="controls">
+                        <button type="button" onclick="changeCount({{ item.id }}, -1)">−</button>
+                        <span id="display_{{ item.id }}">0</span>
+                        <button type="button" onclick="changeCount({{ item.id }}, 1)">+</button>
+                        <input type="hidden" name="count_{{ item.id }}" id="count_{{ item.id }}" value="0">
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
 
         <div class="total">
             Total: $<span id="total">0.00</span>
         </div>
 
-        <button type="submit">Place Order</button>
+        <div>
+            <button type="submit" class="submit-btn">✅ Place Order</button>
+        </div>
     </form>
 
     <script>
